@@ -1,8 +1,11 @@
 == Build ==
 
-autoreconf --install
-./configure --prefix=/opt/libmtag
+./configure
 make
+
+== Install ==
+
+make install
 
 == Test ==
 
