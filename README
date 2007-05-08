@@ -1,0 +1,9 @@
+== Build ==
+
+autoreconf --install
+./configure --prefix=/opt/libmtag
+make
+
+== Test ==
+
+./tests/reader <filename>
