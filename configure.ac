@@ -1,4 +1,4 @@
-AC_INIT([libmtag], [0.1.0.svn], [felipe.contreras@gmail.com])
+AC_INIT([libmtag], [0.1.0], [felipe.contreras@gmail.com])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_HEADERS([config.h])
