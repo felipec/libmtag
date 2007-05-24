@@ -35,11 +35,12 @@ MTag_Tag *
 mtag_file_tag (const MTag_File *file)
 {
 	const TagLib::File *f = reinterpret_cast<const TagLib::File *>(file);
-	return reinterpret_cast<MTag_Tag *>(f->tag());
+	return reinterpret_cast<MTag_Tag *>(f->tag ());
 }
 
 MTag_Tag *
-mtag_file_get_tag (MTag_File *file, const char *id)
+mtag_file_get_tag (MTag_File *file,
+				   const char *id)
 {
 	TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
 	TagLib::Tag *t = NULL;
@@ -105,7 +106,8 @@ _convert (unsigned int v)
 }
 
 char *
-mtag_tag_get (const MTag_Tag *tag, const char *key)
+mtag_tag_get (const MTag_Tag *tag,
+			  const char *key)
 {
 	const TagLib::Tag *t = reinterpret_cast<const TagLib::Tag *>(tag);
 	char *value = NULL;
@@ -143,7 +145,9 @@ mtag_tag_get (const MTag_Tag *tag, const char *key)
 }
 
 void
-mtag_tag_set (MTag_Tag *tag, const char *key, const char *value)
+mtag_tag_set (MTag_Tag *tag, 
+			  const char *key,
+			  const char *value)
 {
 	TagLib::Tag *t = reinterpret_cast<TagLib::Tag *>(tag);
 	TagLib::String s = TagLib::String (value, TagLib::String::UTF8);
