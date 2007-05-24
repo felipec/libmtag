@@ -25,27 +25,33 @@ mtag_file_new (const char *filename)
 	/* Find the file type. */
 	{
 		char buffer[0x4];
+		unsigned char *bin_buffer;
 		FILE *f;
+		int r;
 
 		f = fopen (filename, "r");
+		bin_buffer = (unsigned  char *) buffer;
 
 		if (!f)
 		{
 			return NULL;
 		}
 
-		fread (buffer, 1, 0x4, f);
-		if (strncmp (buffer, "ID3", 3) == 0)
+		r = fread (buffer, 1, 0x4, f);
+		if (r = 0x4)
 		{
-			file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
-		}
-		else if ((buffer[0] & 0xFF) && (buffer[1] & 0x7F))
-		{
-			file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
-		}
-		else if (strncmp (buffer, "OggS", 4) == 0)
-		{
-			file = reinterpret_cast<TagLib::File *>(new TagLib::Vorbis::File (filename));
+			if (strncmp (buffer, "ID3", 3) == 0)
+			{
+				file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
+			}
+			else if ((bin_buffer[0] == 0xFF) && ((bin_buffer[1] & 0xFB) == 0xFB))
+			{
+				file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
+			}
+			else if (strncmp (buffer, "OggS", 4) == 0)
+			{
+				file = reinterpret_cast<TagLib::File *>(new TagLib::Vorbis::File (filename));
+			}
 		}
 		fclose (f);
 	}
