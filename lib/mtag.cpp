@@ -9,6 +9,7 @@
 #include <tstring.h>
 #include <mpegfile.h>
 #include <vorbisfile.h>
+#include <flacfile.h>
 #include <id3v2tag.h>
 #include <id3v2frame.h>
 
@@ -19,8 +20,40 @@
 MTag_File *
 mtag_file_new (const char *filename)
 {
-	TagLib::File *file;
-	file = TagLib::FileRef::create (filename);
+	TagLib::File *file = NULL;
+
+	/* Find the file type. */
+	{
+		char buffer[0x4];
+		FILE *f;
+
+		f = fopen (filename, "r");
+
+		if (!f)
+		{
+			return NULL;
+		}
+
+		fread (buffer, 1, 0x4, f);
+		if (strncmp (buffer, "ID3", 3) == 0)
+		{
+			file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
+		}
+		else if ((buffer[0] & 0xFF) && (buffer[1] & 0x7F))
+		{
+			file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
+		}
+		else if (strncmp (buffer, "OggS", 4) == 0)
+		{
+			file = reinterpret_cast<TagLib::File *>(new TagLib::Vorbis::File (filename));
+		}
+		fclose (f);
+	}
+
+	if (!file)
+	{
+		file = TagLib::FileRef::create (filename);
+	}
 
 	return reinterpret_cast<MTag_File *>(file);
 }
@@ -78,6 +111,41 @@ mtag_file_get_tag (MTag_File *file,
 	}
 
 	return reinterpret_cast<MTag_Tag *>(t);
+}
+
+const char *
+mtag_file_get_type (MTag_File *file)
+{
+	TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
+
+	{
+		TagLib::MPEG::File *rf = NULL;
+
+		if (rf = dynamic_cast<TagLib::MPEG::File *>(f))
+		{
+			return "audio/mpeg";
+		}
+	}
+
+	{
+		TagLib::Vorbis::File *rf = NULL;
+
+		if (rf = dynamic_cast<TagLib::Vorbis::File *>(f))
+		{
+			return "audio/x-vorbis";
+		}
+	}
+
+	{
+		TagLib::FLAC::File *rf = NULL;
+
+		if (rf = dynamic_cast<TagLib::FLAC::File *>(f))
+		{
+			return "audio/x-flac";
+		}
+	}
+
+	return "unknown";
 }
 
 bool
