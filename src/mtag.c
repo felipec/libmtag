@@ -135,7 +135,7 @@ main (int argc,
 	{
 		char c;
 
-		c = getopt_long (argc, argv, "sga:t:k:v:", long_options, &option_index);
+		c = getopt_long (argc, argv, "sga:t:k:v:f:", long_options, &option_index);
 
 		if (c == -1)
 		{
