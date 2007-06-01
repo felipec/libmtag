@@ -1,4 +1,4 @@
-SUBDIRS = lib tests
+SUBDIRS = lib src tests
 
 EXTRA_DIST = libmtag.pc.in
 

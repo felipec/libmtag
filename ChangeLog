@@ -1,3 +1,7 @@
+2007-06-01 Felipe Contreras <felipe.contreras@gmail.com>
+
+	* New CLI application
+
 2007-05-24 Felipe Contreras <felipe.contreras@gmail.com>
 
 	* New get_type method
