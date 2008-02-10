@@ -183,7 +183,7 @@ main (int argc,
         {
             if (type)
             {
-                tag = mtag_file_get_tag (file, type);
+                tag = mtag_file_get_tag (file, type, false);
             }
             else
             {

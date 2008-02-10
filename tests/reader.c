@@ -2,26 +2,18 @@
 
 #include "mtag.h"
 
-void
-print_field (const MTag_Tag *tag,
-             const char *field)
+static void
+each_tag (const char *key,
+          const char *value,
+          void *user_data)
 {
-    printf ("%s: \"%s\"\n", field, mtag_tag_get (tag, field));
+    printf ("%s: \"%s\"\n", key, value);
 }
 
-void
+inline void
 print_tag (const MTag_Tag *tag)
 {
-    if (tag)
-    {
-        print_field (tag, "title");
-        print_field (tag, "artist");
-        print_field (tag, "album");
-        print_field (tag, "comment");
-        print_field (tag, "genre");
-        print_field (tag, "year");
-        print_field (tag, "track");
-    }
+    mtag_tag_for_each (tag, each_tag, NULL);
 }
 
 void
@@ -35,16 +27,16 @@ test_file (const char *fn)
     tag = mtag_file_tag (file);
     print_tag (tag);
 
-    tag = mtag_file_get_tag (file, "id3v2");
+    tag = mtag_file_get_tag (file, "id3v2", false);
     print_tag (tag);
 
-    tag = mtag_file_get_tag (file, "id3v1");
+    tag = mtag_file_get_tag (file, "id3v1", false);
     print_tag (tag);
 
-    tag = mtag_file_get_tag (file, "ape");
+    tag = mtag_file_get_tag (file, "ape", false);
     print_tag (tag);
 
-    tag = mtag_file_get_tag (file, "xc");
+    tag = mtag_file_get_tag (file, "xc", false);
     print_tag (tag);
 
 #if 0
