@@ -205,7 +205,7 @@ mtag_file_save (MTag_File *file)
 inline char *
 _convert (TagLib::String s)
 {
-    return strdup (s.toCString ());
+    return strdup (s.toCString (true));
 }
 
 inline char *
