@@ -6,6 +6,7 @@
 
 static int set_flag = 0;
 static int get_flag = 0;
+static int get_all_flag = 0;
 char *key = NULL;
 char *value = NULL;
 char *type = NULL;
@@ -113,6 +114,21 @@ do_set (MTag_File *file,
     }
 }
 
+void
+show_tag (MTag_File *file,
+	  const char *tag_id)
+{
+    MTag_Tag *tag;
+
+    tag = mtag_file_get_tag (file, tag_id, false);
+
+    if (tag)
+    {
+	printf ("== %s ==\n", tag_id);
+	do_get (file, tag);
+    }
+}
+
 int
 main (int argc,
       char *argv[])
@@ -136,7 +152,7 @@ main (int argc,
     {
         char c;
 
-        c = getopt_long (argc, argv, "sga:t:k:v:f:", long_options, &option_index);
+        c = getopt_long (argc, argv, "sgla:t:k:v:f:", long_options, &option_index);
 
         if (c == -1)
         {
@@ -147,6 +163,7 @@ main (int argc,
         {
             case 's': set_flag = 1; break;
             case 'g': get_flag = 1; break;
+            case 'l': get_all_flag = 1; break;
             case 'a': set ("artist", optarg); break;
             case 't': set ("title", optarg); break;
             case 'k': set_key (optarg); break;
@@ -181,31 +198,41 @@ main (int argc,
 
         if (file)
         {
-            if (type)
-            {
-                tag = mtag_file_get_tag (file, type, false);
-            }
-            else
-            {
-                tag = mtag_file_tag (file);
-            }
+	    if (get_all_flag)
+	    {
+		printf ("= %s =\n", basename (filename));
+		show_tag (file, "id3v1");
+		show_tag (file, "id3v2");
+		show_tag (file, "ape");
+	    }
+	    else
+	    {
+		if (type)
+		{
+		    tag = mtag_file_get_tag (file, type, false);
+		}
+		else
+		{
+		    tag = mtag_file_tag (file);
+		}
 
-            if (tag)
-            {
-                if (get_flag)
-                {
-                    do_get (file, tag);
-                }
+		if (tag)
+		{
+		    if (get_flag)
+		    {
+			do_get (file, tag);
+		    }
 
-                if (set_flag)
-                {
-                    do_set (file, tag);
-                }
-            }
-            else
-            {
-                error = "Bad tag";
-            }
+		    if (set_flag)
+		    {
+			do_set (file, tag);
+		    }
+		}
+		else
+		{
+		    error = "Bad tag";
+		}
+	    }
 
             mtag_file_free (file);
         }
