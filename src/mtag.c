@@ -152,7 +152,7 @@ main (int argc,
     {
         char c;
 
-        c = getopt_long (argc, argv, "sgla:t:k:v:f:", long_options, &option_index);
+        c = getopt_long (argc, argv, "sgla:t:k:v:p:f:", long_options, &option_index);
 
         if (c == -1)
         {
