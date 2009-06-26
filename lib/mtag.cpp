@@ -14,6 +14,8 @@
 #include <id3v2frame.h>
 #include <apetag.h>
 
+#include <stdio.h> /* for fopen, fread, fclose */
+
 /*
  * File
  */

@@ -5,6 +5,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile lib/Makefile tests/Makefile src/Makefile libmtag.pc])
 
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_LIBTOOL
 
 PKG_CHECK_MODULES([TAGLIB], [taglib >= 1.4])
