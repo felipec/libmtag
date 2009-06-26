@@ -1,5 +1,5 @@
-#ifndef MTAG
-#define MTAG
+#ifndef MTAG_H
+#define MTAG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,4 +34,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MTAG */
+#endif /* MTAG_H */
