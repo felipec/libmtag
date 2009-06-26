@@ -11,7 +11,7 @@ each_tag (const char *key,
 }
 
 inline void
-print_tag (const MTag_Tag *tag)
+print_tag (const mtag_tag_t *tag)
 {
     mtag_tag_for_each (tag, each_tag, NULL);
 }
@@ -19,8 +19,8 @@ print_tag (const MTag_Tag *tag)
 void
 test_file (const char *fn)
 {
-    MTag_File *file;
-    MTag_Tag *tag;
+    mtag_file_t *file;
+    mtag_tag_t *tag;
 
     file = mtag_file_new (fn);
 

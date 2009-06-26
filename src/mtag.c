@@ -14,14 +14,14 @@ char *filename = NULL;
 const char *error = NULL;
 
 void
-print_field (const MTag_Tag *tag,
+print_field (const mtag_tag_t *tag,
              const char *field)
 {
     printf ("%s: \"%s\"\n", field, mtag_tag_get (tag, field));
 }
 
 void
-print_tag (const MTag_Tag *tag)
+print_tag (const mtag_tag_t *tag)
 {
     print_field (tag, "title");
     print_field (tag, "artist");
@@ -85,8 +85,8 @@ set (char *_key,
 }
 
 void
-do_get (MTag_File *file,
-        MTag_Tag *tag)
+do_get (mtag_file_t *file,
+        mtag_tag_t *tag)
 {
     if (key)
     {
@@ -99,8 +99,8 @@ do_get (MTag_File *file,
 }
 
 void
-do_set (MTag_File *file,
-        MTag_Tag *tag)
+do_set (mtag_file_t *file,
+        mtag_tag_t *tag)
 {
     if (key)
     {
@@ -115,10 +115,10 @@ do_set (MTag_File *file,
 }
 
 void
-show_tag (MTag_File *file,
+show_tag (mtag_file_t *file,
 	  const char *tag_id)
 {
-    MTag_Tag *tag;
+    mtag_tag_t *tag;
 
     tag = mtag_file_get_tag (file, tag_id, false);
 
@@ -191,8 +191,8 @@ main (int argc,
 
     if (!error)
     {
-        MTag_File *file;
-        MTag_Tag *tag;
+        mtag_file_t *file;
+        mtag_tag_t *tag;
 
         file = mtag_file_new (filename);
 

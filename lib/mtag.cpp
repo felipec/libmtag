@@ -20,7 +20,7 @@
  * File
  */
 
-MTag_File *
+mtag_file_t *
 mtag_file_new (const char *filename)
 {
     TagLib::File *file = NULL;
@@ -64,24 +64,24 @@ mtag_file_new (const char *filename)
         file = TagLib::FileRef::create (filename);
     }
 
-    return reinterpret_cast<MTag_File *>(file);
+    return reinterpret_cast<mtag_file_t *>(file);
 }
 
 void
-mtag_file_free (MTag_File *file)
+mtag_file_free (mtag_file_t *file)
 {
     delete reinterpret_cast<TagLib::File *>(file);
 }
 
-MTag_Tag *
-mtag_file_tag (const MTag_File *file)
+mtag_tag_t *
+mtag_file_tag (const mtag_file_t *file)
 {
     const TagLib::File *f = reinterpret_cast<const TagLib::File *>(file);
-    return reinterpret_cast<MTag_Tag *>(f->tag ());
+    return reinterpret_cast<mtag_tag_t *>(f->tag ());
 }
 
-MTag_Tag *
-mtag_file_get_tag (MTag_File *file,
+mtag_tag_t *
+mtag_file_get_tag (mtag_file_t *file,
                    const char *id,
                    bool create)
 {
@@ -125,11 +125,11 @@ mtag_file_get_tag (MTag_File *file,
         }
     }
 
-    return reinterpret_cast<MTag_Tag *>(t);
+    return reinterpret_cast<mtag_tag_t *>(t);
 }
 
-MTag_Tag *
-mtag_file_strip_tag (MTag_File *file,
+mtag_tag_t *
+mtag_file_strip_tag (mtag_file_t *file,
                      const char *id)
 {
     TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
@@ -160,7 +160,7 @@ mtag_file_strip_tag (MTag_File *file,
 }
 
 const char *
-mtag_file_get_type (MTag_File *file)
+mtag_file_get_type (mtag_file_t *file)
 {
     TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
 
@@ -195,7 +195,7 @@ mtag_file_get_type (MTag_File *file)
 }
 
 bool
-mtag_file_save (MTag_File *file)
+mtag_file_save (mtag_file_t *file)
 {
     return reinterpret_cast<TagLib::File *>(file)->save();
 }
@@ -354,8 +354,8 @@ ape_tag_to_id (const char *tag_name)
     return NULL;
 }
 void
-mtag_tag_for_each (const MTag_Tag *tag,
-                   MTag_Tag_Func func,
+mtag_tag_for_each (const mtag_tag_t *tag,
+                   mtag_tag_func_t func,
                    void *user_data)
 {
     const TagLib::Tag *t = reinterpret_cast<const TagLib::Tag *>(tag);
@@ -415,7 +415,7 @@ mtag_tag_for_each (const MTag_Tag *tag,
 }
 
 char *
-mtag_tag_get (const MTag_Tag *tag,
+mtag_tag_get (const mtag_tag_t *tag,
               const char *key)
 {
     const TagLib::Tag *t = reinterpret_cast<const TagLib::Tag *>(tag);
@@ -454,7 +454,7 @@ mtag_tag_get (const MTag_Tag *tag,
 }
 
 void
-mtag_tag_set (MTag_Tag *tag, 
+mtag_tag_set (mtag_tag_t *tag,
               const char *key,
               const char *value)
 {
