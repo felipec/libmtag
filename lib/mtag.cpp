@@ -16,207 +16,165 @@
 
 #include <stdio.h> /* for fopen, fread, fclose */
 
-/*
- * File
- */
+/* File */
 
 mtag_file_t *
-mtag_file_new (const char *filename)
+mtag_file_new(const char *filename)
 {
-    TagLib::File *file = NULL;
+	TagLib::File *file = NULL;
+	char buffer[0x4];
+	unsigned char *bin_buffer;
+	FILE *f;
+	int r;
 
-    /* Find the file type. */
-    {
-        char buffer[0x4];
-        unsigned char *bin_buffer;
-        FILE *f;
-        int r;
+	/* Find the file type. */
+	f = fopen(filename, "r");
+	bin_buffer = (unsigned char *) buffer;
 
-        f = fopen (filename, "r");
-        bin_buffer = (unsigned char *) buffer;
+	if (!f)
+		return NULL;
 
-        if (!f)
-        {
-            return NULL;
-        }
+	r = fread(buffer, 1, 0x4, f);
+	if (r = 0x4) {
+		if (strncmp(buffer, "ID3", 3) == 0)
+			file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File(filename));
+		else if ((bin_buffer[0] == 0xFF) && ((bin_buffer[1] & 0xFB) == 0xFB))
+			file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File(filename));
+		else if (strncmp(buffer, "OggS", 4) == 0)
+			file = reinterpret_cast<TagLib::File *>(new TagLib::Vorbis::File(filename));
+	}
 
-        r = fread (buffer, 1, 0x4, f);
-        if (r = 0x4)
-        {
-            if (strncmp (buffer, "ID3", 3) == 0)
-            {
-                file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
-            }
-            else if ((bin_buffer[0] == 0xFF) && ((bin_buffer[1] & 0xFB) == 0xFB))
-            {
-                file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File (filename));
-            }
-            else if (strncmp (buffer, "OggS", 4) == 0)
-            {
-                file = reinterpret_cast<TagLib::File *>(new TagLib::Vorbis::File (filename));
-            }
-        }
-        fclose (f);
-    }
+	fclose(f);
 
-    if (!file)
-    {
-        file = TagLib::FileRef::create (filename);
-    }
+	if (!file)
+		file = TagLib::FileRef::create(filename);
 
-    return reinterpret_cast<mtag_file_t *>(file);
+	return reinterpret_cast<mtag_file_t *>(file);
 }
 
 void
-mtag_file_free (mtag_file_t *file)
+mtag_file_free(mtag_file_t *file)
 {
-    delete reinterpret_cast<TagLib::File *>(file);
+	delete reinterpret_cast<TagLib::File *>(file);
 }
 
 mtag_tag_t *
-mtag_file_tag (const mtag_file_t *file)
+mtag_file_tag(const mtag_file_t *file)
 {
-    const TagLib::File *f = reinterpret_cast<const TagLib::File *>(file);
-    return reinterpret_cast<mtag_tag_t *>(f->tag ());
+	const TagLib::File *f = reinterpret_cast<const TagLib::File *>(file);
+	return reinterpret_cast<mtag_tag_t *>(f->tag());
 }
 
 mtag_tag_t *
-mtag_file_get_tag (mtag_file_t *file,
-                   const char *id,
-                   bool create)
+mtag_file_get_tag(mtag_file_t *file,
+		  const char *id,
+		  bool create)
 {
-    TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
-    TagLib::Tag *t = NULL;
+	TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
+	TagLib::Tag *t = NULL;
 
-    if (!t)
-    {
-        TagLib::MPEG::File *rf = NULL;
+	if (!t) {
+		TagLib::MPEG::File *rf = NULL;
 
-        if (rf = dynamic_cast<TagLib::MPEG::File *>(f))
-        {
-            if (strcmp (id, "id3v2") == 0)
-            {
-                t = (TagLib::Tag *) rf->ID3v2Tag (create);
-            }
-            else if (strcmp (id, "id3v1") == 0)
-            {
-                t = (TagLib::Tag *) rf->ID3v1Tag (create);
-            }
-            else if (strcmp (id, "ape") == 0)
-            {
-                t = (TagLib::Tag *) rf->APETag (create);
-            }
+		if (rf = dynamic_cast<TagLib::MPEG::File *>(f)) {
+			if (strcmp(id, "id3v2") == 0)
+				t = (TagLib::Tag *) rf->ID3v2Tag(create);
+			else if (strcmp(id, "id3v1") == 0)
+				t = (TagLib::Tag *) rf->ID3v1Tag(create);
+			else if (strcmp(id, "ape") == 0)
+				t = (TagLib::Tag *) rf->APETag(create);
 
-            if (t && !create && t->isEmpty ())
-                t = NULL;
-        }
-    }
+			if (t && !create && t->isEmpty())
+				t = NULL;
+		}
+	}
 
-    if (!t)
-    {
-        TagLib::Vorbis::File *rf = NULL;
+	if (!t) {
+		TagLib::Vorbis::File *rf = NULL;
 
-        if (rf = dynamic_cast<TagLib::Vorbis::File *>(f))
-        {
-            if (strcmp (id, "xc") == 0)
-            {
-                t = (TagLib::Tag *) rf->tag ();
-            }
-        }
-    }
+		if (rf = dynamic_cast<TagLib::Vorbis::File *>(f)) {
+			if (strcmp(id, "xc") == 0)
+				t = (TagLib::Tag *) rf->tag();
+		}
+	}
 
-    return reinterpret_cast<mtag_tag_t *>(t);
+	return reinterpret_cast<mtag_tag_t *>(t);
 }
 
 mtag_tag_t *
-mtag_file_strip_tag (mtag_file_t *file,
-                     const char *id)
+mtag_file_strip_tag(mtag_file_t *file,
+		    const char *id)
 {
-    TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
+	TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
 
-    {
-        TagLib::MPEG::File *rf = NULL;
+	{
+		TagLib::MPEG::File *rf = NULL;
 
-        if (rf = dynamic_cast<TagLib::MPEG::File *>(f))
-        {
-            int to_strip = TagLib::MPEG::File::NoTags;
+		if (rf = dynamic_cast<TagLib::MPEG::File *>(f)) {
+			int to_strip = TagLib::MPEG::File::NoTags;
 
-            if (strcmp (id, "id3v2") == 0)
-            {
-                to_strip |= TagLib::MPEG::File::ID3v2;
-            }
-            else if (strcmp (id, "id3v1") == 0)
-            {
-                to_strip |= TagLib::MPEG::File::ID3v1;
-            }
-            else if (strcmp (id, "ape") == 0)
-            {
-                to_strip |= TagLib::MPEG::File::APE;
-            }
+			if (strcmp(id, "id3v2") == 0)
+				to_strip |= TagLib::MPEG::File::ID3v2;
+			else if (strcmp(id, "id3v1") == 0)
+				to_strip |= TagLib::MPEG::File::ID3v1;
+			else if (strcmp(id, "ape") == 0)
+				to_strip |= TagLib::MPEG::File::APE;
 
-            rf->strip (to_strip);
-        }
-    }
+			rf->strip(to_strip);
+		}
+	}
 }
 
 const char *
-mtag_file_get_type (mtag_file_t *file)
+mtag_file_get_type(mtag_file_t *file)
 {
-    TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
+	TagLib::File *f = reinterpret_cast<TagLib::File *>(file);
 
-    {
-        TagLib::MPEG::File *rf = NULL;
+	{
+		TagLib::MPEG::File *rf = NULL;
 
-        if (rf = dynamic_cast<TagLib::MPEG::File *>(f))
-        {
-            return "audio/mpeg";
-        }
-    }
+		if (rf = dynamic_cast<TagLib::MPEG::File *>(f))
+			return "audio/mpeg";
+	}
 
-    {
-        TagLib::Vorbis::File *rf = NULL;
+	{
+		TagLib::Vorbis::File *rf = NULL;
 
-        if (rf = dynamic_cast<TagLib::Vorbis::File *>(f))
-        {
-            return "audio/x-vorbis";
-        }
-    }
+		if (rf = dynamic_cast<TagLib::Vorbis::File *>(f))
+			return "audio/x-vorbis";
+	}
 
-    {
-        TagLib::FLAC::File *rf = NULL;
+	{
+		TagLib::FLAC::File *rf = NULL;
 
-        if (rf = dynamic_cast<TagLib::FLAC::File *>(f))
-        {
-            return "audio/x-flac";
-        }
-    }
+		if (rf = dynamic_cast<TagLib::FLAC::File *>(f))
+			return "audio/x-flac";
+	}
 
-    return "unknown";
+	return "unknown";
 }
 
 bool
-mtag_file_save (mtag_file_t *file)
+mtag_file_save(mtag_file_t *file)
 {
-    return reinterpret_cast<TagLib::File *>(file)->save();
+	return reinterpret_cast<TagLib::File *>(file)->save();
 }
 
-/*
- * Tag
- */
+/* Tag */
 
-inline char *
-_convert (TagLib::String s)
+static inline char *
+_convert(TagLib::String s)
 {
-    return strdup (s.toCString (true));
+	return strdup(s.toCString(true));
 }
 
-inline char *
-_convert (unsigned int v)
+static inline char *
+_convert(unsigned int v)
 {
-    char *value = NULL;
-    value = (char *) malloc (10);
-    snprintf (value, 10, "%d", v);
-    return value;
+	char *value = NULL;
+	value = (char *) malloc(10);
+	snprintf(value, 10, "%d", v);
+	return value;
 }
 
 /*
@@ -266,227 +224,179 @@ _convert (unsigned int v)
    4.2.5 TSSE Software/Hardware and settings used for encoding
    4.2.1 TSST Set subtitle
    4.2.2 TXXX User defined text information frame
-*/
+   */
 
-inline const char *
-id3v2_tag_to_id (const char *tag_name)
+static inline const char *
+id3v2_tag_to_id(const char *tag_name)
 {
-    /* 4.2.1 TIT2 Title/songname/content description */
-    if (strcmp (tag_name, "TIT2") == 0)
-        return "title";
-
-    /* 4.2.2 TPE1 Lead performer(s)/Soloist(s) */
-    if (strcmp (tag_name, "TPE1") == 0)
-        return "artist";
-
-    /* 4.2.1 TALB Album/Movie/Show title */
-    if (strcmp (tag_name, "TALB") == 0)
-        return "album";
-
-    /* 4.2.1 TRCK Track number/Position in set */
-    if (strcmp (tag_name, "TRCK") == 0)
-        return "track";
-
-    /* 4.2.5 TDRC Recording time */
-    if (strcmp (tag_name, "TDRC") == 0)
-        return "year";
-
-    /* 4.2.3 TCON Content type */
-    if (strcmp (tag_name, "TCON") == 0)
-        return "genre";
-
-    /* 4.2.2 TCOM Composer */
-    if (strcmp (tag_name, "TCOM") == 0)
-        return "composer";
-
-    /* 4.2.1 TIT1 Content group description */
-    if (strcmp (tag_name, "TIT1") == 0)
-        return "content_description";
-
-    /* 4.2.1 TIT3 Subtitle/Description refinement */
-    if (strcmp (tag_name, "TIT3") == 0)
-        return "subtitle";
-
-    /* 4.2.3 TMOO Mood */
-    if (strcmp (tag_name, "TMOO") == 0)
-        return "mood";
-
-    /* 4.2.2 TPE2 Band/orchestra/accompaniment */
-    if (strcmp (tag_name, "TPE2") == 0)
-        return "band";
-
-    /* 4.2.2 TPE3 Conductor/performer refinement */
-    if (strcmp (tag_name, "TPE3") == 0)
-        return "conductor";
-
-    /* 4.2.2 TPE4 Interpreted, remixed, or otherwise modified by */
-    if (strcmp (tag_name, "TPE4") == 0)
-        return "interpreter";
-
-    /* 4.2.2 TENC Encoded by */
-    if (strcmp (tag_name, "TENC") == 0)
-        return "encoded_by";
-
-    return NULL;
+	if (strcmp(tag_name, "TIT2") == 0)
+		/* 4.2.1 TIT2 Title/songname/content description */
+		return "title";
+	else if (strcmp(tag_name, "TPE1") == 0)
+		/* 4.2.2 TPE1 Lead performer(s)/Soloist(s) */
+		return "artist";
+	else if (strcmp(tag_name, "TALB") == 0)
+		/* 4.2.1 TALB Album/Movie/Show title */
+		return "album";
+	else if (strcmp(tag_name, "TRCK") == 0)
+		/* 4.2.1 TRCK Track number/Position in set */
+		return "track";
+	else if (strcmp(tag_name, "TDRC") == 0)
+		/* 4.2.5 TDRC Recording time */
+		return "year";
+	else if (strcmp(tag_name, "TCON") == 0)
+		/* 4.2.3 TCON Content type */
+		return "genre";
+	else if (strcmp(tag_name, "TCOM") == 0)
+		/* 4.2.2 TCOM Composer */
+		return "composer";
+	else if (strcmp(tag_name, "TIT1") == 0)
+		/* 4.2.1 TIT1 Content group description */
+		return "content_description";
+	else if (strcmp(tag_name, "TIT3") == 0)
+		/* 4.2.1 TIT3 Subtitle/Description refinement */
+		return "subtitle";
+	else if (strcmp(tag_name, "TMOO") == 0)
+		/* 4.2.3 TMOO Mood */
+		return "mood";
+	else if (strcmp(tag_name, "TPE2") == 0)
+		/* 4.2.2 TPE2 Band/orchestra/accompaniment */
+		return "band";
+	else if (strcmp(tag_name, "TPE3") == 0)
+		/* 4.2.2 TPE3 Conductor/performer refinement */
+		return "conductor";
+	else if (strcmp(tag_name, "TPE4") == 0)
+		/* 4.2.2 TPE4 Interpreted, remixed, or otherwise modified by */
+		return "interpreter";
+	else if (strcmp(tag_name, "TENC") == 0)
+		/* 4.2.2 TENC Encoded by */
+		return "encoded_by";
+	else
+		return NULL;
 }
 
-inline const char *
-ape_tag_to_id (const char *tag_name)
+static inline const char *
+ape_tag_to_id(const char *tag_name)
 {
-    if (strcmp (tag_name, "TITLE") == 0)
-        return "title";
-
-    if (strcmp (tag_name, "ARTIST") == 0)
-        return "artist";
-
-    if (strcmp (tag_name, "ALBUM") == 0)
-        return "album";
-
-    if (strcmp (tag_name, "TRACK") == 0)
-        return "track";
-
-    if (strcmp (tag_name, "GENRE") == 0)
-        return "genre";
-
-    if (strcmp (tag_name, "YEAR") == 0)
-        return "year";
-
-    return NULL;
+	if (strcmp(tag_name, "TITLE") == 0)
+		return "title";
+	else if (strcmp(tag_name, "ARTIST") == 0)
+		return "artist";
+	else if (strcmp(tag_name, "ALBUM") == 0)
+		return "album";
+	else if (strcmp(tag_name, "TRACK") == 0)
+		return "track";
+	else if (strcmp(tag_name, "GENRE") == 0)
+		return "genre";
+	else if (strcmp(tag_name, "YEAR") == 0)
+		return "year";
+	else
+		return NULL;
 }
+
 void
-mtag_tag_for_each (const mtag_tag_t *tag,
-                   mtag_tag_func_t func,
-                   void *user_data)
+mtag_tag_for_each(const mtag_tag_t *tag,
+		  mtag_tag_func_t func,
+		  void *user_data)
 {
-    const TagLib::Tag *t = reinterpret_cast<const TagLib::Tag *>(tag);
+	const TagLib::Tag *t = reinterpret_cast<const TagLib::Tag *>(tag);
 
-    if (!func)
-        return;
+	if (!func)
+		return;
 
-    {
-        const TagLib::ID3v2::Tag *rt = NULL;
+	{
+		const TagLib::ID3v2::Tag *rt = NULL;
 
-        if (rt = dynamic_cast<const TagLib::ID3v2::Tag *>(t))
-        {
-            TagLib::ID3v2::FrameList list;
-            list = rt->frameList();
+		if (rt = dynamic_cast<const TagLib::ID3v2::Tag *>(t)) {
+			TagLib::ID3v2::FrameList list;
+			list = rt->frameList();
 
-            TagLib::ID3v2::FrameList::ConstIterator it;
-            for (it = list.begin (); it != list.end (); it++)
-            {
-                char *tag_name;
-                tag_name = strndup ((*it)->frameID ().data(), (*it)->frameID ().size ());
-                func (id3v2_tag_to_id (tag_name),
-                      (*it)->toString ().toCString (),
-                      user_data);
-                free (tag_name);
-            }
+			TagLib::ID3v2::FrameList::ConstIterator it;
+			for (it = list.begin(); it != list.end(); it++) {
+				char *tag_name;
+				tag_name = strndup((*it)->frameID().data(), (*it)->frameID().size());
+				func(id3v2_tag_to_id(tag_name),
+				     (*it)->toString().toCString(),
+				     user_data);
+				free(tag_name);
+			}
 
-            return;
-        }
-    }
+			return;
+		}
+	}
 
-    {
-        const TagLib::APE::Tag *rt = NULL;
+	{
+		const TagLib::APE::Tag *rt = NULL;
 
-        if (rt = dynamic_cast<const TagLib::APE::Tag *>(t))
-        {
-            TagLib::APE::ItemListMap map;
-            map = rt->itemListMap();
+		if (rt = dynamic_cast<const TagLib::APE::Tag *>(t)) {
+			TagLib::APE::ItemListMap map;
+			map = rt->itemListMap();
 
-            TagLib::APE::ItemListMap::ConstIterator it;
-            for (it = map.begin (); it != map.end (); it++)
-            {
-                TagLib::APE::Item item;
-                item = it->second;
-                if (item.type() == TagLib::APE::Item::Text)
-                {
-                    TagLib::String tmp;
-                    tmp = it->first;
-                    func (ape_tag_to_id (tmp.toCString ()),
-                          item.toString ().toCString (),
-                          user_data);
-                }
-            }
+			TagLib::APE::ItemListMap::ConstIterator it;
+			for (it = map.begin(); it != map.end(); it++) {
+				TagLib::APE::Item item;
+				item = it->second;
+				if (item.type() == TagLib::APE::Item::Text) {
+					TagLib::String tmp;
+					tmp = it->first;
+					func(ape_tag_to_id(tmp.toCString()),
+					     item.toString().toCString(),
+					     user_data);
+				}
+			}
 
-            return;
-        }
-    }
+			return;
+		}
+	}
 }
 
 char *
-mtag_tag_get (const mtag_tag_t *tag,
-              const char *key)
+mtag_tag_get(const mtag_tag_t *tag,
+	     const char *key)
 {
-    const TagLib::Tag *t = reinterpret_cast<const TagLib::Tag *>(tag);
-    char *value = NULL;
+	const TagLib::Tag *t = reinterpret_cast<const TagLib::Tag *>(tag);
+	char *value;
 
-    if (strcmp (key, "title") == 0)
-    {
-        value = _convert (t->title ());
-    }
-    else if (strcmp (key, "artist") == 0)
-    {
-        value = _convert (t->artist ());
-    }
-    else if (strcmp (key, "album") == 0)
-    {
-        value = _convert (t->album ());
-    }
-    else if (strcmp (key, "comment") == 0)
-    {
-        value = _convert (t->comment ());
-    }
-    else if (strcmp (key, "genre") == 0)
-    {
-        value = _convert (t->genre ());
-    }
-    else if (strcmp (key, "year") == 0)
-    {
-        value = _convert (t->year ());
-    }
-    else if (strcmp (key, "track") == 0)
-    {
-        value = _convert (t->track ());
-    }
+	if (strcmp(key, "title") == 0)
+		value = _convert(t->title());
+	else if (strcmp(key, "artist") == 0)
+		value = _convert(t->artist());
+	else if (strcmp(key, "album") == 0)
+		value = _convert(t->album());
+	else if (strcmp(key, "comment") == 0)
+		value = _convert(t->comment());
+	else if (strcmp(key, "genre") == 0)
+		value = _convert(t->genre());
+	else if (strcmp(key, "year") == 0)
+		value = _convert(t->year());
+	else if (strcmp(key, "track") == 0)
+		value = _convert(t->track());
+	else
+		value = NULL;
 
-    return value;
+	return value;
 }
 
 void
-mtag_tag_set (mtag_tag_t *tag,
-              const char *key,
-              const char *value)
+mtag_tag_set(mtag_tag_t *tag,
+	     const char *key,
+	     const char *value)
 {
-    TagLib::Tag *t = reinterpret_cast<TagLib::Tag *>(tag);
-    TagLib::String s = TagLib::String (value, TagLib::String::UTF8);
+	TagLib::Tag *t = reinterpret_cast<TagLib::Tag *>(tag);
+	TagLib::String s = TagLib::String(value, TagLib::String::UTF8);
 
-    if (strcmp (key, "title") == 0)
-    {
-        t->setTitle (s);
-    }
-    else if (strcmp (key, "artist") == 0)
-    {
-        t->setArtist (s);
-    }
-    else if (strcmp (key, "album") == 0)
-    {
-        t->setAlbum (s);
-    }
-    else if (strcmp (key, "comment") == 0)
-    {
-        t->setComment (s);
-    }
-    else if (strcmp (key, "genre") == 0)
-    {
-        t->setGenre (s);
-    }
-    else if (strcmp (key, "year") == 0)
-    {
-        t->setYear (s.toInt ());
-    }
-    else if (strcmp (key, "track") == 0)
-    {
-        t->setTrack (s.toInt ());
-    }
+	if (strcmp(key, "title") == 0)
+		t->setTitle(s);
+	else if (strcmp(key, "artist") == 0)
+		t->setArtist(s);
+	else if (strcmp(key, "album") == 0)
+		t->setAlbum(s);
+	else if (strcmp(key, "comment") == 0)
+		t->setComment(s);
+	else if (strcmp(key, "genre") == 0)
+		t->setGenre(s);
+	else if (strcmp(key, "year") == 0)
+		t->setYear(s.toInt());
+	else if (strcmp(key, "track") == 0)
+		t->setTrack(s.toInt());
 }
