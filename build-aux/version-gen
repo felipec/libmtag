@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if test -f .version; then
+        v=`cat .version`
+else
+        v=`git describe --tags | sed 's/^v//'`
+fi
+
+# for m4_esyscmd
+echo "$v" | tr -d '\012'

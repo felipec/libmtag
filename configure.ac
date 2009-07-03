@@ -1,4 +1,5 @@
-AC_INIT([libmtag], [0.2.0], [felipe.contreras@gmail.com])
+AC_INIT([libmtag], m4_esyscmd([build-aux/version-gen]),
+        [felipe.contreras@gmail.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
