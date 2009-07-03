@@ -1,0 +1,17 @@
+= 0.3.0 =
+
+ * New strip tag method
+ * New create tag method
+ * New for-each function
+ * Use unicode strings
+ * CLI application improved
+ * API break
+
+= 0.2.0 =
+
+ * New CLI application
+ * New get_type method
+
+= 0.1.0 =
+
+ * Initial release
