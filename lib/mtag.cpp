@@ -316,7 +316,7 @@ mtag_tag_for_each(const mtag_tag_t *tag,
 				char *tag_name;
 				tag_name = strndup((*it)->frameID().data(), (*it)->frameID().size());
 				func(id3v2_tag_to_id(tag_name),
-				     (*it)->toString().toCString(),
+				     (*it)->toString().toCString(true),
 				     user_data);
 				free(tag_name);
 			}
@@ -340,7 +340,7 @@ mtag_tag_for_each(const mtag_tag_t *tag,
 					TagLib::String tmp;
 					tmp = it->first;
 					func(ape_tag_to_id(tmp.toCString()),
-					     item.toString().toCString(),
+					     item.toString().toCString(true),
 					     user_data);
 				}
 			}
