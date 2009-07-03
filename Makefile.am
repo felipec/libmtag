@@ -1,6 +1,6 @@
 SUBDIRS = lib src tests
 
-EXTRA_DIST = libmtag.pc.in
+EXTRA_DIST = libmtag.pc.in build-aux/version-gen
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libmtag.pc
