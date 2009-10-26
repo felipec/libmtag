@@ -101,7 +101,7 @@ mtag_file_get_tag(mtag_file_t *file,
 	return reinterpret_cast<mtag_tag_t *>(t);
 }
 
-mtag_tag_t *
+void
 mtag_file_strip_tag(mtag_file_t *file,
 		    const char *id)
 {

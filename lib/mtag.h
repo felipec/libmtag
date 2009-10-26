@@ -26,8 +26,8 @@ extern "C" {
 	void mtag_tag_for_each(const mtag_tag_t *tag,
 			       mtag_tag_func_t func,
 			       void *user_data);
-	mtag_tag_t *mtag_file_strip_tag(mtag_file_t *file,
-					const char *id);
+	void mtag_file_strip_tag(mtag_file_t *file,
+				 const char *id);
 
 	char *mtag_tag_get(const mtag_tag_t *tag,
 			   const char *key);
