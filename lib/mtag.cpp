@@ -35,7 +35,7 @@ mtag_file_new(const char *filename)
 		return NULL;
 
 	r = fread(buffer, 1, 0x4, f);
-	if (r = 0x4) {
+	if (r == 0x4) {
 		if (strncmp(buffer, "ID3", 3) == 0)
 			file = reinterpret_cast<TagLib::File *>(new TagLib::MPEG::File(filename));
 		else if ((bin_buffer[0] == 0xFF) && ((bin_buffer[1] & 0xFB) == 0xFB))
@@ -76,7 +76,7 @@ mtag_file_get_tag(mtag_file_t *file,
 	if (!t) {
 		TagLib::MPEG::File *rf = NULL;
 
-		if (rf = dynamic_cast<TagLib::MPEG::File *>(f)) {
+		if ((rf = dynamic_cast<TagLib::MPEG::File *>(f))) {
 			if (strcmp(id, "id3v2") == 0)
 				t = (TagLib::Tag *) rf->ID3v2Tag(create);
 			else if (strcmp(id, "id3v1") == 0)
@@ -92,7 +92,7 @@ mtag_file_get_tag(mtag_file_t *file,
 	if (!t) {
 		TagLib::Vorbis::File *rf = NULL;
 
-		if (rf = dynamic_cast<TagLib::Vorbis::File *>(f)) {
+		if ((rf = dynamic_cast<TagLib::Vorbis::File *>(f))) {
 			if (strcmp(id, "xc") == 0)
 				t = (TagLib::Tag *) rf->tag();
 		}
@@ -110,7 +110,7 @@ mtag_file_strip_tag(mtag_file_t *file,
 	{
 		TagLib::MPEG::File *rf = NULL;
 
-		if (rf = dynamic_cast<TagLib::MPEG::File *>(f)) {
+		if ((rf = dynamic_cast<TagLib::MPEG::File *>(f))) {
 			int to_strip = TagLib::MPEG::File::NoTags;
 
 			if (strcmp(id, "id3v2") == 0)
@@ -133,21 +133,21 @@ mtag_file_get_type(mtag_file_t *file)
 	{
 		TagLib::MPEG::File *rf = NULL;
 
-		if (rf = dynamic_cast<TagLib::MPEG::File *>(f))
+		if ((rf = dynamic_cast<TagLib::MPEG::File *>(f)))
 			return "audio/mpeg";
 	}
 
 	{
 		TagLib::Vorbis::File *rf = NULL;
 
-		if (rf = dynamic_cast<TagLib::Vorbis::File *>(f))
+		if ((rf = dynamic_cast<TagLib::Vorbis::File *>(f)))
 			return "audio/x-vorbis";
 	}
 
 	{
 		TagLib::FLAC::File *rf = NULL;
 
-		if (rf = dynamic_cast<TagLib::FLAC::File *>(f))
+		if ((rf = dynamic_cast<TagLib::FLAC::File *>(f)))
 			return "audio/x-flac";
 	}
 
@@ -307,7 +307,7 @@ mtag_tag_for_each(const mtag_tag_t *tag,
 	{
 		const TagLib::ID3v2::Tag *rt = NULL;
 
-		if (rt = dynamic_cast<const TagLib::ID3v2::Tag *>(t)) {
+		if ((rt = dynamic_cast<const TagLib::ID3v2::Tag *>(t))) {
 			TagLib::ID3v2::FrameList list;
 			list = rt->frameList();
 
@@ -328,7 +328,7 @@ mtag_tag_for_each(const mtag_tag_t *tag,
 	{
 		const TagLib::APE::Tag *rt = NULL;
 
-		if (rt = dynamic_cast<const TagLib::APE::Tag *>(t)) {
+		if ((rt = dynamic_cast<const TagLib::APE::Tag *>(t))) {
 			TagLib::APE::ItemListMap map;
 			map = rt->itemListMap();
 
