@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2007-2009 Felipe Contreras
+ *
+ * This code is licenced under the LGPLv2.1.
+ */
+
 #include <stdbool.h>
 #include <string.h>
 
