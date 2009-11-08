@@ -6,6 +6,5 @@ includedir=@includedir@
 Name: libmtag
 Description: Music tagging library
 Version: @VERSION@
-Requires: taglib
 Libs: -L${libdir} -lmtag
 Cflags: -I${includedir}/libmtag
