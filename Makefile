@@ -74,6 +74,7 @@ $(binaries):
 	$(QUIET_CC)$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -o $@ -c $<
 
 clean:
-	$(QUIET_CLEAN)$(RM) $(binaries) `find -name '[*.oad]'`
+	$(QUIET_CLEAN)$(RM) libmtag.so $(binaries) libmtag.pc \
+		`find -name '*.[oad]'`
 
 -include lib/*.d src/*.d tests/*.d
