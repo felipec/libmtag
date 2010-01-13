@@ -7,6 +7,7 @@ TAGLIB_CPPFLAGS := $(shell pkg-config --cflags taglib)
 TAGLIB_LIBS := $(shell pkg-config --libs taglib)
 
 prefix := /usr
+libdir := $(prefix)/lib
 version := $(shell ./get-version)
 
 all:
@@ -34,13 +35,13 @@ libmtag.pc: libmtag.pc.in
 D = $(DESTDIR)
 
 install: libmtag.so libmtag.pc
-	mkdir -p $(D)/$(prefix)/lib
-	install -m 755 libmtag.so $(D)/$(prefix)/lib/libmtag.so.0
-	ln -sf libmtag.so.0 $(D)/$(prefix)/lib/libmtag.so
+	mkdir -p $(D)/$(libdir)
+	install -m 755 libmtag.so $(D)/$(libdir)/libmtag.so.0
+	ln -sf libmtag.so.0 $(D)/$(libdir)/libmtag.so
 	mkdir -p $(D)/$(prefix)/include/libmtag
 	install -m 644 lib/mtag.h $(D)/$(prefix)/include/libmtag
-	mkdir -p $(D)/$(prefix)/lib/pkgconfig
-	install -m 644 libmtag.pc $(D)/$(prefix)/lib/pkgconfig/libmtag.pc
+	mkdir -p $(D)/$(libdir)/pkgconfig
+	install -m 644 libmtag.pc $(D)/$(libdir)/pkgconfig/libmtag.pc
 
 dist: base := libmtag-$(version)
 dist:
