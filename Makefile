@@ -13,18 +13,18 @@ version := $(shell ./get-version)
 all:
 
 libmtag.so: lib/mtag.o
-libmtag.so: CPPFLAGS := $(CPPFLAGS) $(TAGLIB_CPPFLAGS) -I./lib -fPIC
-libmtag.so: LIBS := $(LIBS) $(TAGLIB_LIBS)
+libmtag.so: override CPPFLAGS += $(TAGLIB_CPPFLAGS) -I./lib -fPIC
+libmtag.so: override LIBS += $(TAGLIB_LIBS)
 libmtag.so: LDFLAGS := $(LDFLAGS) -Wl,-soname,libmtag.so.0
 
 mtag: src/mtag.o | libmtag.so
-mtag: CPPFLAGS := $(CPPFLAGS) -I./lib
-mtag: LIBS := $(LIBS) -L./ -lmtag
+mtag: override CPPFLAGS += -I./lib
+mtag: override LIBS += -L./ -lmtag
 binaries += mtag
 
 tests/reader: tests/reader.o | libmtag.so
-tests/reader: CPPFLAGS := $(CPPFLAGS) -I./lib
-tests/reader: LIBS := $(LIBS) -L./ -lmtag
+tests/reader: override CPPFLAGS += -I./lib
+tests/reader: override LIBS += -L./ -lmtag
 binaries += tests/reader
 
 all: libmtag.so $(binaries)
