@@ -30,7 +30,9 @@ binaries += tests/reader
 all: libmtag.so $(binaries)
 
 libmtag.pc: libmtag.pc.in
-	sed -e 's#@prefix@#$(prefix)#g' -e 's#@version@#$(version)#g' $< > $@
+	sed -e 's#@prefix@#$(prefix)#g' \
+		-e 's#@version@#$(version)#g' \
+		-e 's#@libdir@#$(libdir)#g' $< > $@
 
 D = $(DESTDIR)
 
