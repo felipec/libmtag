@@ -12,7 +12,7 @@ version := $(shell ./get-version)
 all:
 
 libmtag.so: lib/mtag.o
-libmtag.so: CPPFLAGS := $(CPPFLAGS) $(TAGLIB_CPPFLAGS) -I./lib
+libmtag.so: CPPFLAGS := $(CPPFLAGS) $(TAGLIB_CPPFLAGS) -I./lib -fPIC
 libmtag.so: LIBS := $(LIBS) $(TAGLIB_LIBS)
 libmtag.so: LDFLAGS := $(LDFLAGS) -Wl,-soname,libmtag.so.0
 
