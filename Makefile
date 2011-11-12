@@ -1,7 +1,8 @@
-CC := gcc
-CXX := g++
+CC := $(CROSS_COMPILE)gcc
+CXX := $(CROSS_COMPILE)g++
 
-CPPFLAGS := -ggdb -Wall -Wextra -Wno-unused-parameter
+CPPFLAGS := -O2 -ggdb -Wall -Wextra -Wno-unused-parameter
+LDFLAGS := -Wl,--no-undefined -Wl,--as-needed
 
 TAGLIB_CPPFLAGS := $(shell pkg-config --cflags taglib)
 TAGLIB_LIBS := $(shell pkg-config --libs taglib)
@@ -14,7 +15,7 @@ all:
 
 libmtag.so: lib/mtag.o
 libmtag.so: override CPPFLAGS += $(TAGLIB_CPPFLAGS) -I./lib -fPIC
-libmtag.so: override LIBS += $(TAGLIB_LIBS)
+libmtag.so: override LIBS += $(TAGLIB_LIBS) -lstdc++
 libmtag.so: LDFLAGS := $(LDFLAGS) -Wl,-soname,libmtag.so.0
 
 mtag: src/mtag.o | libmtag.so
@@ -56,18 +57,18 @@ dist:
 	gzip /tmp/$(base).tar
 
 # pretty print
-V = @
-Q = $(V:y=)
-QUIET_CC    = $(Q:@=@echo '   CC         '$@;)
-QUIET_CXX   = $(Q:@=@echo '   CXX        '$@;)
-QUIET_LINK  = $(Q:@=@echo '   LINK       '$@;)
-QUIET_CLEAN = $(Q:@=@echo '   CLEAN      '$@;)
+ifndef V
+QUIET_CC    = @echo '   CC         '$@;
+QUIET_CXX   = @echo '   CXX        '$@;
+QUIET_LINK  = @echo '   LINK       '$@;
+QUIET_CLEAN = @echo '   CLEAN      '$@;
+endif
 
 %.so::
-	$(QUIET_LINK)$(CC) $(LDFLAGS) -shared -o $@ $^ $(LIBS)
+	$(QUIET_LINK)$(CC) $(LDFLAGS) -shared $^ $(LIBS) -o $@
 
 $(binaries):
-	$(QUIET_LINK)$(CC) $(LDFLAGS) $(LIBS) -o $@ $^
+	$(QUIET_LINK)$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
 
 %.o:: %.cpp
 	$(QUIET_CXX)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -o $@ -c $<
